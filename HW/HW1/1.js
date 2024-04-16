@@ -42,7 +42,7 @@ const musicCollection = {
           let album = this.albums[index];
           index++;
           return {
-            value: `${album.title} - ${album.artist} (${album.year})`,
+            value: album,
             done: false,
           };
         }
@@ -54,6 +54,6 @@ const musicCollection = {
   },
 };
 
-for (let album of musicCollection) {
-  console.log(album);
+for (const album of musicCollection) {
+  console.log(`${album.title} - ${album.artist} (${album.year})`);
 }

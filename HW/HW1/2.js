@@ -58,23 +58,56 @@ class Manager {
       ['Андрей', 'Суши'],
       ['Анна', 'Десерты'],
     ]);
+    this.orders = new Map();
   }
   newOrder(client, ...orders) {
     console.log(`Клиент ${client.firstname} заказал:`);
-    orders.forEach((order) => {
-      const dish = order.name;
-      const quantity = order.quantity;
-      const type = order.type;
-      if (this.menu[type] && this.menu[type].has(dish)) {
+    if (this.orders.has(client.firstname)) {
+      const existingOrders = this.orders.get(client.firstname);
+      orders.forEach((order) => {
+        const dish = order.name;
+        const quantity = order.quantity;
+        const type = order.type;
+        if (this.menu[type] && this.menu[type].has(dish)) {
+          const index = existingOrders.findIndex(
+            (o) => o.name === dish && o.type === type
+          );
+          if (index !== -1) {
+            existingOrders[index].quantity += order.quantity;
+          } else {
+            existingOrders.push(order);
+          }
+        } else {
+          throw Error(`Десерт "${dish}" - такого блюда не существует.`);
+        }
+      });
+      existingOrders.forEach((order) => {
         console.log(
-          `${type} "${dish}" - ${quantity}; готовит повар ${this.menu[type].get(
-            dish
-          )}`
+          `${order.type} "${order.name}" - ${
+            order.quantity
+          }; готовит повар ${this.menu[order.type].get(order.name)}`
         );
-      } else {
-        throw Error(`Десерт "${dish}" - такого блюда не существует.`);
-      }
-    });
+      });
+    } else {
+      const newOrders = [];
+
+      orders.forEach((order) => {
+        const dish = order.name;
+        const quantity = order.quantity;
+        const type = order.type;
+        if (this.menu[type] && this.menu[type].has(dish)) {
+          newOrders.push(order);
+          console.log(
+            `${type} "${dish}" - ${quantity}; готовит повар ${this.menu[
+              type
+            ].get(dish)}`
+          );
+        } else {
+          throw Error(`Десерт "${dish}" - такого блюда не существует.`);
+        }
+      });
+      this.orders.set(client.firstname, newOrders);
+    }
   }
 }
 
